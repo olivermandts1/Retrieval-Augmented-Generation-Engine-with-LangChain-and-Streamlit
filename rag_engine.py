@@ -250,7 +250,7 @@ if menu_item == "Creative Text Refresher":
 
 
     # User inputs their OpenAI API key in the sidebar
-    openai_api_key = st.session_state.openai_api_key
+    openai_api_key = st.text_input("OpenAI API key", type="password")
 
         # Dropdown to select a chain name
     chain_names_df = conn.read(worksheet="PromptChainRepo", usecols=['ChainName'], ttl=5)
@@ -396,7 +396,7 @@ elif menu_item == "Prompt Chain Builder":
     st.title("Test Your Chain Here")
 
     # User inputs their OpenAI API key in the sidebar
-    openai_api_key = st.session_state.openai_api_key
+    openai_api_key = st.text_input("OpenAI API key", type="password")
 
     # Dropdown to select action
     action = st.selectbox("Action", ["Create New Chain", "Edit Existing Chain"])
