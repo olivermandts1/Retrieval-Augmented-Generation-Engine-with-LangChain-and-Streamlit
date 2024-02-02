@@ -6,3 +6,4 @@ unstructured[pdf]
 openai
 chromadb
 tiktoken
+st-gsheets-connection
