@@ -1,33 +1,60 @@
-import os, tempfile
+import os
+import tempfile
 import pinecone
+import streamlit as st
+import pandas as pd
+from streamlit_gsheets import GSheetsConnection
+import json
 from pathlib import Path
-
 from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import Chroma, Pinecone
 from langchain import OpenAI
 from langchain.llms.openai import OpenAIChat
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma, Pinecone
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 
-import streamlit as st
-
-import pandas as pd
-from streamlit_gsheets import GSheetsConnection
-import json
-
+# Set page configuration
 st.set_page_config(page_title="RAG")
 
-
-
+# Define global variables
 TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
 LOCAL_VECTOR_STORE_DIR = Path(__file__).resolve().parent.joinpath('data', 'vector_store')
 
+# Define the title
 st.title("Retrieval Augmented Generation Engine")
+
+# Utility function to get and set API keys
+def get_api_keys():
+    if "openai_api_key" not in st.session_state:
+        st.session_state.openai_api_key = st.secrets.get("openai_api_key", None)
+    if "pinecone_api_key" not in st.session_state:
+        st.session_state.pinecone_api_key = st.secrets.get("pinecone_api_key", None)
+    if "pinecone_env" not in st.session_state:
+        st.session_state.pinecone_env = st.secrets.get("pinecone_env", None)
+    if "pinecone_index" not in st.session_state:
+        st.session_state.pinecone_index = st.secrets.get("pinecone_index", None)
+
+# Modified input_fields function
+def input_fields():
+    with st.sidebar:
+        # Get API keys
+        get_api_keys()
+
+        # If API key is not set, ask the user to input it
+        if st.session_state.openai_api_key is None:
+            st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
+        if st.session_state.pinecone_api_key is None:
+            st.session_state.pinecone_api_key = st.text_input("Pinecone API key", type="password")
+        if st.session_state.pinecone_env is None:
+            st.session_state.pinecone_env = st.text_input("Pinecone environment")
+        if st.session_state.pinecone_index is None:
+            st.session_state.pinecone_index = st.text_input("Pinecone index name")
+
+        st.session_state.pinecone_db = st.checkbox('Use Pinecone Vector DB')
+        st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
 
 
 def load_documents():
@@ -64,35 +91,6 @@ def query_llm(retriever, query):
     result = result['answer']
     st.session_state.messages.append((query, result))
     return result
-
-def input_fields():
-    #
-    with st.sidebar:
-        #
-        if "openai_api_key" in st.secrets:
-            st.session_state.openai_api_key = st.secrets.openai_api_key
-        else:
-            st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
-        #
-        if "pinecone_api_key" in st.secrets:
-            st.session_state.pinecone_api_key = st.secrets.pinecone_api_key
-        else: 
-            st.session_state.pinecone_api_key = st.text_input("Pinecone API key", type="password")
-        #
-        if "pinecone_env" in st.secrets:
-            st.session_state.pinecone_env = st.secrets.pinecone_env
-        else:
-            st.session_state.pinecone_env = st.text_input("Pinecone environment")
-        #
-        if "pinecone_index" in st.secrets:
-            st.session_state.pinecone_index = st.secrets.pinecone_index
-        else:
-            st.session_state.pinecone_index = st.text_input("Pinecone index name")
-    #
-    st.session_state.pinecone_db = st.toggle('Use Pinecone Vector DB')
-    #
-    st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
-    #
 
 
 def process_documents():
