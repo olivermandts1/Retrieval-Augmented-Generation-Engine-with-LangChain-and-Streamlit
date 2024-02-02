@@ -250,7 +250,7 @@ if menu_item == "Creative Text Refresher":
 
 
     # User inputs their OpenAI API key in the sidebar
-    openai_api_key = st.secrets["openai_secret"]
+    openai_api_key = st.session_state.openai_api_key
 
         # Dropdown to select a chain name
     chain_names_df = conn.read(worksheet="PromptChainRepo", usecols=['ChainName'], ttl=5)
