@@ -19,6 +19,7 @@ import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
 
+st.set_page_config(page_title="RAG")
 
 # Create a connection using Streamlit's experimental connection feature
 conn = st.experimental_connection("gsheets", type=GSheetsConnection)
@@ -80,7 +81,6 @@ with st.expander("Show Full Table"):
 TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
 LOCAL_VECTOR_STORE_DIR = Path(__file__).resolve().parent.joinpath('data', 'vector_store')
 
-st.set_page_config(page_title="RAG")
 st.title("Retrieval Augmented Generation Engine")
 
 
