@@ -1,50 +1,24 @@
 import streamlit as st
-import os, tempfile
-import pinecone
 from pathlib import Path
-
-from langchain.chains import RetrievalQA, ConversationalRetrievalChain
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma, Pinecone
+from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.openai import OpenAIChat
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain_community.vectorstores import Chroma
 
 def show_rag_testing_form():
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
-    LOCAL_VECTOR_STORE_DIR = Path(__file__).resolve().parent.joinpath('data', 'vector_store')
 
     st.title("Retrieval Augmented Generation Engine")
 
     # Input fields function
     def input_fields():
-        if "openai_api_key" in st.secrets:
-            st.session_state.openai_api_key = st.secrets.openai_api_key
-        else:
-            st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
-        
-        if "pinecone_api_key" in st.secrets:
-            st.session_state.pinecone_api_key = st.secrets.pinecone_api_key
-        else: 
-            st.session_state.pinecone_api_key = st.text_input("Pinecone API key", type="password")
-        
-        if "pinecone_env" in st.secrets:
-            st.session_state.pinecone_env = st.secrets.pinecone_env
-        else:
-            st.session_state.pinecone_env = st.text_input("Pinecone environment")
-        
-        if "pinecone_index" in st.secrets:
-            st.session_state.pinecone_index = st.secrets.pinecone_index
-        else:
-            st.session_state.pinecone_index = st.text_input("Pinecone index name")
-        
-        st.session_state.pinecone_db = st.checkbox('Use Pinecone Vector DB')
+        st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
         st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
 
-    # Call input fields in main area
     input_fields()
 
-    # Document processing and other functions
     def load_documents():
         loader = DirectoryLoader(TMP_DIR.as_posix(), glob='**/*.pdf')
         documents = loader.load()
@@ -55,18 +29,10 @@ def show_rag_testing_form():
         texts = text_splitter.split_documents(documents)
         return texts
 
-    def embeddings_on_local_vectordb(texts):
-        vectordb = Chroma.from_documents(texts, embedding=OpenAIEmbeddings(),
-                                         persist_directory=LOCAL_VECTOR_STORE_DIR.as_posix())
-        vectordb.persist()
+    def embeddings_on_chroma(texts):
+        embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+        vectordb = Chroma.from_documents(texts, embedding_function)
         retriever = vectordb.as_retriever(search_kwargs={'k': 7})
-        return retriever
-
-    def embeddings_on_pinecone(texts):
-        pinecone.init(api_key=st.session_state.pinecone_api_key, environment=st.session_state.pinecone_env)
-        embeddings = OpenAIEmbeddings(openai_api_key=st.session_state.openai_api_key)
-        vectordb = Pinecone.from_documents(texts, embeddings, index_name=st.session_state.pinecone_index)
-        retriever = vectordb.as_retriever()
         return retriever
 
     def query_llm(retriever, query):
@@ -80,33 +46,8 @@ def show_rag_testing_form():
         st.session_state.messages.append((query, result))
         return result
 
-    def input_fields():
-        with st.sidebar:
-            if "openai_api_key" in st.secrets:
-                st.session_state.openai_api_key = st.secrets.openai_api_key
-            else:
-                st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
-            
-            if "pinecone_api_key" in st.secrets:
-                st.session_state.pinecone_api_key = st.secrets.pinecone_api_key
-            else: 
-                st.session_state.pinecone_api_key = st.text_input("Pinecone API key", type="password")
-            
-            if "pinecone_env" in st.secrets:
-                st.session_state.pinecone_env = st.secrets.pinecone_env
-            else:
-                st.session_state.pinecone_env = st.text_input("Pinecone environment")
-            
-            if "pinecone_index" in st.secrets:
-                st.session_state.pinecone_index = st.secrets.pinecone_index
-            else:
-                st.session_state.pinecone_index = st.text_input("Pinecone index name")
-            
-            st.session_state.pinecone_db = st.checkbox('Use Pinecone Vector DB')
-            st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
-
     def process_documents():
-        if not st.session_state.openai_api_key or not st.session_state.pinecone_api_key or not st.session_state.pinecone_env or not st.session_state.pinecone_index or not st.session_state.source_docs:
+        if not st.session_state.openai_api_key or not st.session_state.source_docs:
             st.warning(f"Please upload the documents and provide the missing fields.")
         else:
             try:
@@ -121,18 +62,12 @@ def show_rag_testing_form():
                         temp_file.unlink()
                     
                     texts = split_documents(documents)
-                    
-                    if not st.session_state.pinecone_db:
-                        st.session_state.retriever = embeddings_on_local_vectordb(texts)
-                    else:
-                        st.session_state.retriever = embeddings_on_pinecone(texts)
+                    st.session_state.retriever = embeddings_on_chroma(texts)
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
-    # Process documents button
     st.button("Submit Documents", on_click=process_documents)
 
-    # Chat messages and input
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
