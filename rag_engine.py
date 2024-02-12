@@ -2,6 +2,7 @@ import streamlit as st
 import rag_testing
 import prompt_chain_builder
 import creative_text_refresher
+import content_generator
 
 st.sidebar.title("Navigation")
 choice = st.sidebar.radio("Choose a menu", ("RAG Testing Form", "Prompt Chain Builder", 'Creative Text Refresher'))
