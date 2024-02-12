@@ -90,8 +90,8 @@ def show_prompt_chain_builder():
         # User inputs their OpenAI API key
         openai_api_key = "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"
 
-        # Dropdown to select action
-        action = st.selectbox("Action", ["Create New Chain", "Edit Existing Chain"])
+    # Dropdown to select action
+    action = st.selectbox("Action", ["Create New Chain", "Edit Existing Chain"])
 
     if action == "Create New Chain":
 
