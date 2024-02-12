@@ -4,8 +4,8 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.openai import OpenAIChat
 from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain.vectorstores import Chroma
 import tempfile
 
 def show_rag_testing_form():
