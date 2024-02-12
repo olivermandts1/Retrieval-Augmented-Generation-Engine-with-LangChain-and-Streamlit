@@ -17,7 +17,7 @@ from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 
 def show_rag_testing_form():
 
-    st.set_page_config(page_title="RAG")
+
 
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
     LOCAL_VECTOR_STORE_DIR = Path(__file__).resolve().parent.joinpath('data', 'vector_store')
