@@ -12,3 +12,5 @@ elif choice == "Prompt Chain Builder":
     prompt_chain_builder.show_prompt_chain_builder()
 elif choice == 'Creative Text Refresher':
     creative_text_refresher.show_creative_text_refresher()
+elif choice == 'Content Generator':
+    content_generator.show_content_generator()
