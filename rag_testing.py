@@ -6,16 +6,18 @@ from langchain.document_loaders import DirectoryLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain_community.vectorstores import Chroma
+import tempfile
 
 def show_rag_testing_form():
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
 
     st.title("Retrieval Augmented Generation Engine")
 
+    # Initialize st.session_state.retriever
+    if 'retriever' not in st.session_state:
+        st.session_state.retriever = None
 
     st.session_state.openai_api_key = st.secrets["openai_secret"]
-
-    # Input fields function
     st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
 
     def load_documents():
@@ -75,6 +77,12 @@ def show_rag_testing_form():
         st.chat_message('ai').write(message[1])    
     
     if query := st.chat_input():
-        st.chat_message("human").write(query)
-        response = query_llm(st.session_state.retriever, query)
-        st.chat_message("ai").write(response)
+        if st.session_state.retriever is not None:
+            st.chat_message("human").write(query)
+            response = query_llm(st.session_state.retriever, query)
+            st.chat_message("ai").write(response)
+        else:
+            st.error("Retriever not initialized. Please submit documents first.")
+
+if __name__ == '__main__':
+    show_rag_testing_form()
