@@ -16,6 +16,35 @@ def show_rag_testing_form():
 
     st.title("Retrieval Augmented Generation Engine")
 
+    # Input fields function
+    def input_fields():
+        if "openai_api_key" in st.secrets:
+            st.session_state.openai_api_key = st.secrets.openai_api_key
+        else:
+            st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
+        
+        if "pinecone_api_key" in st.secrets:
+            st.session_state.pinecone_api_key = st.secrets.pinecone_api_key
+        else: 
+            st.session_state.pinecone_api_key = st.text_input("Pinecone API key", type="password")
+        
+        if "pinecone_env" in st.secrets:
+            st.session_state.pinecone_env = st.secrets.pinecone_env
+        else:
+            st.session_state.pinecone_env = st.text_input("Pinecone environment")
+        
+        if "pinecone_index" in st.secrets:
+            st.session_state.pinecone_index = st.secrets.pinecone_index
+        else:
+            st.session_state.pinecone_index = st.text_input("Pinecone index name")
+        
+        st.session_state.pinecone_db = st.checkbox('Use Pinecone Vector DB')
+        st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
+
+    # Call input fields in main area
+    input_fields()
+
+    # Document processing and other functions
     def load_documents():
         loader = DirectoryLoader(TMP_DIR.as_posix(), glob='**/*.pdf')
         documents = loader.load()
@@ -100,9 +129,10 @@ def show_rag_testing_form():
             except Exception as e:
                 st.error(f"An error occurred: {e}")
 
-    input_fields()
+    # Process documents button
     st.button("Submit Documents", on_click=process_documents)
 
+    # Chat messages and input
     if "messages" not in st.session_state:
         st.session_state.messages = []
     
