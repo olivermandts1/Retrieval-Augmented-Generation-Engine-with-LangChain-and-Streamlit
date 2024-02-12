@@ -12,12 +12,11 @@ def show_rag_testing_form():
 
     st.title("Retrieval Augmented Generation Engine")
 
-    # Input fields function
-    def input_fields():
-        st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
-        st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
 
-    input_fields()
+    st.session_state.openai_api_key = st.secrets["openai_secret"]
+
+    # Input fields function
+    st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
 
     def load_documents():
         loader = DirectoryLoader(TMP_DIR.as_posix(), glob='**/*.pdf')
