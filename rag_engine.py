@@ -5,7 +5,7 @@ import creative_text_refresher
 import content_generator
 
 st.sidebar.title("Navigation")
-choice = st.sidebar.radio("Choose a menu", ("RAG Testing Form", "Prompt Chain Builder", 'Creative Text Refresher'))
+choice = st.sidebar.radio("Choose a menu", ("RAG Testing Form", "Prompt Chain Builder", 'Creative Text Refresher', 'Content Generator'))
 
 if choice == "RAG Testing Form":
     rag_testing.show_rag_testing_form()
