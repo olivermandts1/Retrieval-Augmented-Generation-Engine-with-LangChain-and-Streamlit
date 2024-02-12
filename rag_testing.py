@@ -49,23 +49,30 @@ def show_rag_testing_form():
 
     def process_documents():
         if not st.session_state.openai_api_key or not st.session_state.source_docs:
-            st.warning(f"Please upload the documents and provide the missing fields.")
+            st.warning("Please upload the documents and provide the missing fields.")
         else:
             try:
                 for source_doc in st.session_state.source_docs:
+                    st.info("Processing document...")
                     with tempfile.NamedTemporaryFile(delete=False, dir=TMP_DIR.as_posix(), suffix='.pdf') as tmp_file:
                         tmp_file.write(source_doc.read())
-                    
+                    st.info("Document written to temporary file.")
+
+                    st.info("Loading documents...")
                     documents = load_documents()
-                    
-                    for _file in TMP_DIR.iterdir():
-                        temp_file = TMP_DIR.joinpath(_file)
-                        temp_file.unlink()
-                    
+                    st.info("Documents loaded.")
+
+                    st.info("Splitting documents...")
                     texts = split_documents(documents)
+                    st.info("Documents split.")
+
+                    st.info("Creating embeddings...")
                     st.session_state.retriever = embeddings_on_chroma(texts)
+                    st.info("Embeddings created and retriever initialized.")
             except Exception as e:
                 st.error(f"An error occurred: {e}")
+                st.text("Error traceback:")
+                st.text(traceback.format_exc())
 
     st.button("Submit Documents", on_click=process_documents)
 
