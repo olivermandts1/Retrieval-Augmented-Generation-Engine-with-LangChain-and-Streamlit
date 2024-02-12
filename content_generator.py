@@ -58,7 +58,7 @@ def show_content_generator():
     conn = st.experimental_connection("gsheets", type=GSheetsConnection)
 
     # Read data from the Google Sheet
-    df = conn.read(worksheet="PlutusDataImport", ttl=10)
+    df = conn.read(worksheet="ContentGeneratorImport", ttl=10)
     desired_range = df.iloc[0:17, 0:2]  # Rows 100-124 and columns A-B (0-indexed)
 
     # Hardcoding specific values in column A
