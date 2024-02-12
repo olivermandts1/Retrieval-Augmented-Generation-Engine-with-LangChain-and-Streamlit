@@ -61,7 +61,3 @@ def show_prompt_chain_builder():
 
         # Display the DataFrame with text wrapping inside the expander
         st.markdown(desired_range.to_html(escape=False, index=False), unsafe_allow_html=True)
-
-
-    TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
-    LOCAL_VECTOR_STORE_DIR = Path(__file__).resolve().parent.joinpath('data', 'vector_store')
