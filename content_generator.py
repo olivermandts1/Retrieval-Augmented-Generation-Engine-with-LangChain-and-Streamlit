@@ -61,25 +61,18 @@ def show_content_generator():
     df = conn.read(worksheet="CGDataImport", ttl=10)
     desired_range = df.iloc[0:17, 0:2]  # Rows 100-124 and columns A-B (0-indexed)
 
-    # Hardcoding specific values in column A
-    desired_range.iloc[3, 0] = 'Topic'      # Rows 4
-    desired_range.iloc[4, 0] = 'Value Props'  # Rows 5
-    desired_range.iloc[12, 0] = 'Title'  # Rows 13
-    desired_range.iloc[13, 0] = 'Intro Paragraph'    # Rows 14
-    desired_range.iloc[14:16, 0] = 'Headers'    # Rows 15-17
-
     # Replace NaN values with an empty string
     desired_range.fillna('', inplace=True)
 
     # Rename the columns
-    desired_range.columns = ['Asset Type', 'Creative Text']
+    desired_range.columns = ['Parameter', 'Value']
 
     # Store values, omitting nulls
-    topic = [text for text in desired_range[desired_range['Asset Type'] == 'Topic']['Creative Text'] if text]
-    value_props = [text for text in desired_range[desired_range['Asset Type'] == 'Value Props']['Creative Text'] if text]
-    title = [text for text in desired_range[desired_range['Asset Type'] == 'Title']['Creative Text'] if text]
-    intro_paragraph = [text for text in desired_range[desired_range['Asset Type'] == 'Intro Paragraph']['Creative Text'] if text]
-    headers = [text for text in desired_range[desired_range['Asset Type'] == 'Headers']['Creative Text'] if text]
+    topic = [text for text in desired_range[desired_range['Parameter'] == 'Topic']['Value'] if text]
+    value_props = [text for text in desired_range[desired_range['Parameter'] == 'Value Props']['Value'] if text]
+    title = [text for text in desired_range[desired_range['Parameter'] == 'Title']['Value'] if text]
+    intro_paragraph = [text for text in desired_range[desired_range['Parameter'] == 'Intro Paragraph']['Value'] if text]
+    headers = [text for text in desired_range[desired_range['Parameter'] == 'Headers']['Value'] if text]
     
 
     # Use st.expander to create a toggle for showing the full table
