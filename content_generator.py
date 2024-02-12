@@ -4,7 +4,7 @@ from streamlit_gsheets import GSheetsConnection
 from openai import OpenAI
 import json
 
-def show_creative_text_refresher():
+def show_content_generator():
     st.subheader("📗 Test Content Generator Prompt Chains")
     st.markdown("Currently Linked CG sheet: https://docs.google.com/spreadsheets/d/1Qim226h-O7xpnqDctwjdmKDwBUGE5rbwELwdjgPeFn0/edit?usp=sharing")
     st.markdown("Prompt Chain Repository: https://docs.google.com/spreadsheets/d/1tqm7G0yzckwSCKXdPcGcWNH6y5nMj68rhpMQZlcO2wU/edit#gid=954337905")
