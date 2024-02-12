@@ -6,7 +6,6 @@ st.sidebar.title("Navigation")
 choice = st.sidebar.radio("Choose a menu", ("RAG Testing Form", "Google Sheets Import"))
 
 if choice == "RAG Testing Form":
-    st.set_page_config(page_title="RAG")
     rag_testing.show_rag_testing_form()
 elif choice == "Google Sheets Import":
     prompt_chain_builder.show_prompt_chain_builder()
