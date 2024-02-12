@@ -15,7 +15,6 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
 
-st.set_page_config(page_title="RAG")
 
 
 def show_rag_testing_form():
