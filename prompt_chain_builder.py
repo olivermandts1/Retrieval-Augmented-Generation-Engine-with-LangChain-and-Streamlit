@@ -88,7 +88,7 @@ def show_prompt_chain_builder():
                 return "An error occurred while generating the response."
 
         # User inputs their OpenAI API key
-        openai_api_key = "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"
+        openai_api_key = st.secrets["openai_secret"]
 
     # Dropdown to select action
     action = st.selectbox("Action", ["Create New Chain", "Edit Existing Chain"])
