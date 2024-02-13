@@ -50,7 +50,7 @@ def show_rag_testing_form():
 
     def query_llm(retriever, query):
         qa_chain = ConversationalRetrievalChain.from_llm(
-            llm=OpenAIChat(openai_api_key)
+            llm=OpenAIChat(openai_api_key),
             retriever=retriever,
             return_source_documents=True,
         )
