@@ -26,6 +26,7 @@ def show_rag_testing_form():
     if 'retriever' not in st.session_state:
         st.session_state.retriever = None
 
+    openai_api_key = st.session_state.openai_api_key = st.secrets["openai_secret"]
     st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="txt", accept_multiple_files=True)
 
     def load_and_split_documents():
@@ -49,7 +50,7 @@ def show_rag_testing_form():
 
     def query_llm(retriever, query):
         qa_chain = ConversationalRetrievalChain.from_llm(
-            llm=OpenAIChat(openai_api_key="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"),
+            llm=OpenAIChat(openai_api_key)
             retriever=retriever,
             return_source_documents=True,
         )
