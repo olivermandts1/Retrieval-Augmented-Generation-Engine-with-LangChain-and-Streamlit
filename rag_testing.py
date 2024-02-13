@@ -7,6 +7,7 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain.vectorstores import Chroma
 import tempfile
 import traceback
+import os
 
 
 __import__('pysqlite3')
@@ -26,7 +27,6 @@ def show_rag_testing_form():
     if 'retriever' not in st.session_state:
         st.session_state.retriever = None
 
-    st.session_state.openai_api_key = st.secrets.get("openai_api_key", "")
     st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="txt", accept_multiple_files=True)
 
     def load_and_split_documents():
@@ -49,36 +49,31 @@ def show_rag_testing_form():
         return retriever
 
     def query_llm(retriever, query):
-        print("API Key from session state:", st.session_state.openai_api_key)  # Debugging line
         if 'openai_api_key' in st.session_state and st.session_state.openai_api_key:
-            print("API Key is set in session state.")  # Debugging line
             try:
-                llm = OpenAIChat(openai_api_key=st.session_state.openai_api_key)
+                # Set the OpenAI API key as an environment variable
+                os.environ["OPENAI_API_KEY"] = st.session_state.openai_api_key
+
+                # Create an instance of OpenAIChat without passing the API key as a parameter
+                llm = OpenAIChat()
                 qa_chain = ConversationalRetrievalChain.from_llm(
                     llm=llm,
                     retriever=retriever,
                     return_source_documents=True,
                 )
-                print("Query:", query)  # Debugging line
-                print("Retriever:", retriever)  # Debugging line
-
                 result = qa_chain({'question': query, 'chat_history': st.session_state.messages})
-                print("Result from ConversationalRetrievalChain:", result)  # Debugging line
-
-                if not result or not result['answer']:
-                    print("Received an empty or None response.")  # Debugging line
-                    st.error("No response received. Please check your query or configuration.")
+                
+                if result and 'answer' in result:
+                    answer = result['answer']
+                    st.session_state.messages.append((query, answer))
+                    return answer
+                else:
+                    st.error("No response received or invalid response format.")
                     return None
-
-                result = result['answer']
-                st.session_state.messages.append((query, result))
-                return result
             except Exception as e:
-                print("Error in OpenAIChat instantiation:", e)  # Debugging line
                 st.error(f"An error occurred: {e}")
                 return None
         else:
-            print("OpenAI API key is not set.")  # Debugging line
             st.error("OpenAI API key is not set. Please check your Streamlit secrets.")
             return None
 
