@@ -2,47 +2,40 @@ import streamlit as st
 from pathlib import Path
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.openai import OpenAIChat
-from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.vectorstores import Chroma
 import tempfile
 import traceback
 
+class Document:
+    def __init__(self, text):
+        self.page_content = text
+
 def show_rag_testing_form():
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
 
     st.title("Retrieval Augmented Generation Engine")
 
-    # Initialize st.session_state.retriever
     if 'retriever' not in st.session_state:
         st.session_state.retriever = None
 
     st.session_state.openai_api_key = st.secrets["openai_secret"]
     st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="txt", accept_multiple_files=True)
 
-    def load_documents():
+    def load_and_split_documents():
         documents = []
         for source_doc in st.session_state.source_docs:
-            documents.append(source_doc.getvalue().decode("utf-8"))
-        return documents
+            text = source_doc.getvalue().decode("utf-8")
+            documents.append(text)
 
-    def split_documents(documents):
-        # Define your chunk size, e.g., number of lines or characters
-        chunk_size = 1000  # Example chunk size in characters
+        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        split_texts = text_splitter.split_documents(documents)
+        doc_objects = [Document(text) for text in split_texts]
+        return doc_objects
 
-        texts = []
-        for doc in documents:
-            # Split the document into chunks of the specified size
-            for i in range(0, len(doc), chunk_size):
-                chunk = doc[i:i+chunk_size]
-                texts.append(chunk)
-        return texts
-
-    def embeddings_on_chroma(texts):
+    def embeddings_on_chroma(documents):
         embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-        # Create a list of objects with 'page_content' attribute
-        documents = [{'page_content': text} for text in texts]
         vectordb = Chroma.from_documents(documents, embedding_function)
         retriever = vectordb.as_retriever(search_kwargs={'k': 7})
         return retriever
@@ -63,16 +56,12 @@ def show_rag_testing_form():
             st.warning("Please upload the documents and provide the missing fields.")
         else:
             try:
-                st.info("Loading documents...")
-                documents = load_documents()
-                st.info("Documents loaded.")
-
-                st.info("Splitting documents...")
-                texts = split_documents(documents)
-                st.info("Documents split.")
+                st.info("Loading and splitting documents...")
+                documents = load_and_split_documents()
+                st.info("Documents loaded and split.")
 
                 st.info("Creating embeddings...")
-                st.session_state.retriever = embeddings_on_chroma(texts)
+                st.session_state.retriever = embeddings_on_chroma(documents)
                 st.info("Embeddings created and retriever initialized.")
             except Exception as e:
                 st.error(f"An error occurred: {e}")
@@ -98,4 +87,3 @@ def show_rag_testing_form():
 
 if __name__ == '__main__':
     show_rag_testing_form()
-
