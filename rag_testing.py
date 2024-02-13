@@ -5,7 +5,6 @@ from langchain.llms.openai import OpenAIChat
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.vectorstores import Chroma
-import tempfile
 import traceback
 import os
 
