@@ -7,6 +7,8 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.vectorstores import Chroma
 import tempfile
+import traceback
+
 
 def show_rag_testing_form():
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
