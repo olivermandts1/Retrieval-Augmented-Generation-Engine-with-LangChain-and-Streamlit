@@ -11,6 +11,7 @@ import traceback
 class Document:
     def __init__(self, text):
         self.page_content = text
+        self.metadata = {}
 
 def show_rag_testing_form():
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
