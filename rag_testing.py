@@ -28,8 +28,15 @@ def show_rag_testing_form():
         return documents
 
     def split_documents(documents):
-        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-        texts = text_splitter.split_documents(documents)
+        # Define your chunk size, e.g., number of lines or characters
+        chunk_size = 1000  # Example chunk size in characters
+
+        texts = []
+        for doc in documents:
+            # Split the document into chunks of the specified size
+            for i in range(0, len(doc), chunk_size):
+                chunk = doc[i:i+chunk_size]
+                texts.append(chunk)
         return texts
 
     def embeddings_on_chroma(texts):
