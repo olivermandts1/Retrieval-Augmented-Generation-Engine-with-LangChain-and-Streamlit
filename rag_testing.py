@@ -46,12 +46,16 @@ def show_rag_testing_form():
 
         # Convert the split documents back into Document objects
         split_doc_objects = [Document(doc.page_content) for doc in split_texts]
+        print(f"Loaded and split {len(split_texts)} documents.")  # Debugging
+
         return split_doc_objects
 
     def embeddings_on_chroma(documents):
         embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
         vectordb = Chroma.from_documents(documents, embedding_function)
         retriever = vectordb.as_retriever(search_kwargs={'k': 7})
+        print(f"Created embeddings for {len(documents)} documents.")  # Debugging
+
         return retriever
 
     def query_llm(retriever, query):
@@ -68,7 +72,8 @@ def show_rag_testing_form():
                     return_source_documents=True,
                 )
                 result = qa_chain({'question': query, 'chat_history': st.session_state.messages})
-                
+                print(f"Query: {query}")  # Debugging
+                print(f"Retriever state: {retriever}")  # Debugging                
                 if result and 'answer' in result:
                     answer = result['answer']
                     st.session_state.messages.append((query, answer))
@@ -79,6 +84,7 @@ def show_rag_testing_form():
             except Exception as e:
                 st.error(f"An error occurred: {e}")
                 return None
+
         else:
             st.error("OpenAI API key is not set. Please check your Streamlit secrets.")
             return None
