@@ -49,7 +49,7 @@ def show_rag_testing_form():
 
     def query_llm(retriever, query):
         qa_chain = ConversationalRetrievalChain.from_llm(
-            llm=OpenAIChat(openai_api_key=st.secrets["openai_secret"]),
+            llm=OpenAIChat(openai_api_key="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"),
             retriever=retriever,
             return_source_documents=True,
         )
