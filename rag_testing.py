@@ -41,7 +41,9 @@ def show_rag_testing_form():
 
     def embeddings_on_chroma(texts):
         embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-        vectordb = Chroma.from_documents(texts, embedding_function)
+        # Create a list of objects with 'page_content' attribute
+        documents = [{'page_content': text} for text in texts]
+        vectordb = Chroma.from_documents(documents, embedding_function)
         retriever = vectordb.as_retriever(search_kwargs={'k': 7})
         return retriever
 
