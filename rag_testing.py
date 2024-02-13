@@ -2,13 +2,12 @@ import streamlit as st
 from pathlib import Path
 from langchain.chains import ConversationalRetrievalChain
 from langchain.llms.openai import OpenAIChat
-from langchain.document_loaders import DirectoryLoader
+from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.vectorstores import Chroma
 import tempfile
 import traceback
-
 
 def show_rag_testing_form():
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
@@ -20,11 +19,12 @@ def show_rag_testing_form():
         st.session_state.retriever = None
 
     st.session_state.openai_api_key = st.secrets["openai_secret"]
-    st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="pdf", accept_multiple_files=True)
+    st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="txt", accept_multiple_files=True)
 
     def load_documents():
-        loader = DirectoryLoader(TMP_DIR.as_posix(), glob='**/*.pdf')
-        documents = loader.load()
+        documents = []
+        for source_doc in st.session_state.source_docs:
+            documents.append(source_doc.getvalue().decode("utf-8"))
         return documents
 
     def split_documents(documents):
@@ -54,23 +54,17 @@ def show_rag_testing_form():
             st.warning("Please upload the documents and provide the missing fields.")
         else:
             try:
-                for source_doc in st.session_state.source_docs:
-                    st.info("Processing document...")
-                    with tempfile.NamedTemporaryFile(delete=False, dir=TMP_DIR.as_posix(), suffix='.pdf') as tmp_file:
-                        tmp_file.write(source_doc.read())
-                    st.info("Document written to temporary file.")
+                st.info("Loading documents...")
+                documents = load_documents()
+                st.info("Documents loaded.")
 
-                    st.info("Loading documents...")
-                    documents = load_documents()
-                    st.info("Documents loaded.")
+                st.info("Splitting documents...")
+                texts = split_documents(documents)
+                st.info("Documents split.")
 
-                    st.info("Splitting documents...")
-                    texts = split_documents(documents)
-                    st.info("Documents split.")
-
-                    st.info("Creating embeddings...")
-                    st.session_state.retriever = embeddings_on_chroma(texts)
-                    st.info("Embeddings created and retriever initialized.")
+                st.info("Creating embeddings...")
+                st.session_state.retriever = embeddings_on_chroma(texts)
+                st.info("Embeddings created and retriever initialized.")
             except Exception as e:
                 st.error(f"An error occurred: {e}")
                 st.text("Error traceback:")
@@ -95,3 +89,4 @@ def show_rag_testing_form():
 
 if __name__ == '__main__':
     show_rag_testing_form()
+
