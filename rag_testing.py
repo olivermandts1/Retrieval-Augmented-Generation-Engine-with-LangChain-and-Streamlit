@@ -19,6 +19,13 @@ class Document:
         self.metadata = {}
 
 def show_rag_testing_form():
+    
+    # Initialize session state variables
+    if 'openai_api_key' not in st.session_state:
+        st.session_state.openai_api_key = st.secrets.get("openai_api_key", "")
+    if 'retriever' not in st.session_state:
+        st.session_state.retriever = None
+
     TMP_DIR = Path(__file__).resolve().parent.joinpath('data', 'tmp')
 
     st.title("Retrieval Augmented Generation Engine")
