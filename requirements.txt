@@ -7,4 +7,3 @@ openai
 chromadb
 tiktoken
 st-gsheets-connection
-PyMuPDF

@@ -8,7 +8,6 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain.vectorstores import Chroma
 import tempfile
 import traceback
-import fitz 
 
 
 def show_rag_testing_form():
