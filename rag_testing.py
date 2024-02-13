@@ -49,18 +49,24 @@ def show_rag_testing_form():
         return retriever
 
     def query_llm(retriever, query):
+        print("API Key from session state:", st.session_state.openai_api_key)  # Debugging line
         if 'openai_api_key' in st.session_state and st.session_state.openai_api_key:
-            llm = OpenAIChat(openai_api_key=st.session_state.openai_api_key)
-            qa_chain = ConversationalRetrievalChain.from_llm(
-                llm=llm,
-                retriever=retriever,
-                return_source_documents=True,
-            )
-            result = qa_chain({'question': query, 'chat_history': st.session_state.messages})
-            result = result['answer']
-            st.session_state.messages.append((query, result))
-            return result
+            print("API Key is set in session state.")  # Debugging line
+            try:
+                llm = OpenAIChat(openai_api_key=st.session_state.openai_api_key)
+                qa_chain = ConversationalRetrievalChain.from_llm(
+                    llm=llm,
+                    retriever=retriever,
+                    return_source_documents=True,
+                )
+                result = qa_chain({'question': query, 'chat_history': st.session_state.messages})
+                result = result['answer']
+                st.session_state.messages.append((query, result))
+                return result
+            except Exception as e:
+                print("Error in OpenAIChat instantiation:", e)  # Debugging line
         else:
+            print("OpenAI API key is not set.")  # Debugging line
             st.error("OpenAI API key is not set. Please check your Streamlit secrets.")
 
     def process_documents():
