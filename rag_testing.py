@@ -26,7 +26,7 @@ def show_rag_testing_form():
     if 'retriever' not in st.session_state:
         st.session_state.retriever = None
 
-    st.session_state.openai_api_key = st.secrets.get("openai_secret", "")
+    st.session_state.openai_api_key = st.secrets.get("openai_api_key", "")
     st.session_state.source_docs = st.file_uploader(label="Upload Documents", type="txt", accept_multiple_files=True)
 
     def load_and_split_documents():
