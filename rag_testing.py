@@ -1,7 +1,7 @@
 import streamlit as st
 from pathlib import Path
 from langchain.chains import ConversationalRetrievalChain
-from langchain.llms.openai import OpenAIChat
+from langchain.chat_models import ChatOpenAI
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.vectorstores import Chroma
@@ -19,7 +19,7 @@ class Document:
         self.metadata = {}
 
 def show_rag_testing_form():
-    
+
     # Initialize session state variables
     if 'openai_api_key' not in st.session_state:
         st.session_state.openai_api_key = st.secrets.get("openai_api_key", "")
@@ -61,7 +61,7 @@ def show_rag_testing_form():
                 os.environ["OPENAI_API_KEY"] = st.session_state.openai_api_key
 
                 # Create an instance of OpenAIChat without passing the API key as a parameter
-                llm = OpenAIChat()
+                llm = ChatOpenAI()
                 qa_chain = ConversationalRetrievalChain.from_llm(
                     llm=llm,
                     retriever=retriever,
