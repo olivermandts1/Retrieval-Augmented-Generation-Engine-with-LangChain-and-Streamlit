@@ -7,6 +7,8 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain.vectorstores import Chroma
 import tempfile
 import traceback
+import pysqlite3 as sqlite3
+
 
 class Document:
     def __init__(self, text):

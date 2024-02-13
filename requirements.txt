@@ -8,3 +8,4 @@ chromadb
 tiktoken
 st-gsheets-connection
 sentence_transformers
+pysqlite3-binary
