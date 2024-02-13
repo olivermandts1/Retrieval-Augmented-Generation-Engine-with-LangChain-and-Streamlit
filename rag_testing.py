@@ -27,12 +27,14 @@ def show_rag_testing_form():
         documents = []
         for source_doc in st.session_state.source_docs:
             text = source_doc.getvalue().decode("utf-8")
-            documents.append(text)
+            documents.append(Document(text))
 
         text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         split_texts = text_splitter.split_documents(documents)
-        doc_objects = [Document(text) for text in split_texts]
-        return doc_objects
+
+        # Convert the split documents back into Document objects
+        split_doc_objects = [Document(doc.page_content) for doc in split_texts]
+        return split_doc_objects
 
     def embeddings_on_chroma(documents):
         embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
