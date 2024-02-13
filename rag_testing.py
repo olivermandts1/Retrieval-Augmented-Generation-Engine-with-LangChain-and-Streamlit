@@ -59,15 +59,29 @@ def show_rag_testing_form():
                     retriever=retriever,
                     return_source_documents=True,
                 )
+                print("Query:", query)  # Debugging line
+                print("Retriever:", retriever)  # Debugging line
+
                 result = qa_chain({'question': query, 'chat_history': st.session_state.messages})
+                print("Result from ConversationalRetrievalChain:", result)  # Debugging line
+
+                if not result or not result['answer']:
+                    print("Received an empty or None response.")  # Debugging line
+                    st.error("No response received. Please check your query or configuration.")
+                    return None
+
                 result = result['answer']
                 st.session_state.messages.append((query, result))
                 return result
             except Exception as e:
                 print("Error in OpenAIChat instantiation:", e)  # Debugging line
+                st.error(f"An error occurred: {e}")
+                return None
         else:
             print("OpenAI API key is not set.")  # Debugging line
             st.error("OpenAI API key is not set. Please check your Streamlit secrets.")
+            return None
+
 
     def process_documents():
         if not st.session_state.openai_api_key or not st.session_state.source_docs:
