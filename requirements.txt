@@ -3,7 +3,7 @@ pinecone_client==2.2.2
 streamlit==1.26.0
 unstructured
 unstructured[pdf]
-openai
+openai==0.28
 chromadb
 tiktoken
 st-gsheets-connection
